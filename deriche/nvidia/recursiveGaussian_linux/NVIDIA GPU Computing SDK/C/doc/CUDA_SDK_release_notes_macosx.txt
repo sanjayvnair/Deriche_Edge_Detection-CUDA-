@@ -1,0 +1,271 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+NVIDIA GPU Computing Software Development Kit
+Release Notes
+Version 2.3 for MAC OSX
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+Please, also refer to the release notes of version 2.3 of the CUDA Toolkit, 
+installed by the CUDA Toolkit installer.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+I.   Quick Start Installation Instructions
+II.  Detailed Installation Instructions
+III. Creating Your Own CUDA Program
+IV.  Known Issues
+V.   Frequently Asked Questions
+VI.  Change Log
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+I. Quick Start Instructions
+--------------------------------------------------------------------------------
+
+For more detailed instructions, see section II below.
+
+Note: The default installation folder <SDK_INSTALL_PATH> is "/Developer/GPU Computing"
+
+0. Install the NVIDIA Driver Package:
+
+   a. For NVIDIA GeForce GPUs, install this package:
+      cudadriver_2.3.0_macos.pkg
+
+   b. For NVIDIA Quadro GPUs, install this package:
+      cudadriver_2.3.1_macos.pkg
+
+   (Note this for MAC OSX Leopard (10.5.x))
+
+1. Install version 2.3 of the NVIDIA Toolkit package by executing the file
+      cudatoolkit_2.3_macos_32.pkg
+
+   (Note this for MAC OSX Leopard (10.5.x))
+
+2. Install version 2.3 of the NVIDIA GPU Computing SDK by executing the file 
+   cudasdk_2.3_macos.pkg
+
+3. Build the SDK project examples.Computing
+
+	cd <SDK_INSTALL_PATH>
+	make
+    
+4. Run the examples:
+    
+	cd <SDK_INSTALL_PATH>/C/bin/darwin/release
+        ./matrixMul
+
+   (or any of the other executables in that directory)
+
+See the next section for more details on installing, building, and running
+SDK samples.
+
+--------------------------------------------------------------------------------
+II. Detailed Instructions for building the SDK
+--------------------------------------------------------------------------------
+
+Note: The default installation folder <SDK_INSTALL_PATH> is "/Developer/GPU Computing"
+
+1. Build the SDK project examples.  
+    a. Go to <SDK_INSTALL_PATH> ("cd <SDK_INSTALL_PATH>")
+    b. Build:
+        - release    configuration by typing "make".
+        - debug      configuration by typing "make dbg=1".
+        - emurelease configuration by typing "make emu=1".
+        - emudebug   configuration by typing "make emu=1 dbg=1".
+
+    Running make at the top level first builds libcutil, a utility library used
+    by the SDK examples (libcutil is simply for convenience -- it is not a part
+    of CUDA and is not required for your own CUDA programs).  Make then builds
+    each of the projects in the SDK.  
+
+    NOTES:
+    - The release and debug configurations require a CUDA-capable GPU to run
+      properly (see Appendix A.1 of the CUDA Programming Guide for a complete
+      list of CUDA-capable GPUs).
+    - The emurelease and emudebug configurations run in device emulation mode, 
+      and therefore do not require a CUDA-capable GPU to run properly.
+    - You can build an individual sample by typing "make" 
+      (or "make emu=1", etc.) in that sample's project directory. For example:
+
+        cd <SDK_INSTALL_PATH>/C/src/matrixMul
+        make emu=1
+
+      And then execute the sample with:
+        <SDK_INSTALL_PATH>/C/bin/darwin/emurelease/matrixmul
+
+    - To build just libcutil, type "make" (or "make dbg=1") in the "common" 
+      subdirectory:
+
+        cd <SDK_INSTALL_PATH>/C/common
+        make
+
+4. Run the examples from the release, debug, emurelease, or emudebug 
+   directories located in
+   
+     <SDK_INSTALL_PATH>/C/bin/darwin/[release|debug|emurelease|emudebug].
+
+
+--------------------------------------------------------------------------------
+III. Creating Your Own CUDA Program
+--------------------------------------------------------------------------------
+
+Note: The default installation folder <SDK_INSTALL_PATH> is "/Developer/GPU Computing"
+
+Creating a new CUDA Program using the NVIDIA GPU Computing SDK infrastructure is easy.
+We have provided a "template" project that you can copy and modify to suit your
+needs. Just follow these steps:
+
+1. Copy the template project
+
+        cd <SDK_INSTALL_PATH>/C/src
+        cp -r template <myproject>
+
+2. Edit the filenames of the project to suit your needs
+
+        mv template.cu myproject.cu
+        mv template_kernel.cu myproject_kernel.cu
+        mv template_gold.cpp myproject_gold.cpp
+
+3. Edit the Makefile and source files.  Just search and replace all occurences 
+   of "template" with "myproject".
+
+4. Build the project
+
+        make
+
+   You can build a debug version with "make dbg=1", an emulation version with 
+   "make emu=1", and a debug emulation with "make dbg=1 emu=1".
+
+5. Run the program
+
+        ../../C/bin/darwin/release/myproject
+
+   (It should print "Test PASSED")
+
+6. Now modify the code to perform the computation you require.  See the
+   CUDA Programming Guide for details of programming in CUDA.
+
+
+--------------------------------------------------------------------------------
+IV. Known Issues
+--------------------------------------------------------------------------------
+
+Note: Please see the CUDA Toolkit release notes for additional issues.
+
+There are currently no known issues with the CUDA Toolkit
+
+--------------------------------------------------------------------------------
+V. Frequently Asked Questions
+--------------------------------------------------------------------------------
+
+The Official CUDA FAQ is available online on the NVIDIA CUDA Forums:
+http://forums.nvidia.com/index.php?showtopic=84440
+
+Note: Please also see the CUDA Toolkit release notes for additional Frequently 
+Asked Questions.
+
+--------------------------------------------------------------------------------
+VI. Change Log
+--------------------------------------------------------------------------------
+
+Release 2.3 Beta
+* Added PTXJIT
+  - New GPU Computing SDK sample that illustrates how to use cuModuleLoadDataEx 
+  - Loads a PTX source file from memory instead of file.
+
+Release 2.2.1
+* Updated common.mk file to removed -m32 when generating CUBIN output
+* Support for PTX output has been added to common.mk
+* CUDA Driver API samples: simpleTextureDrv, matrixMulDrv, and threadMigration
+  have been updated to reflect changes:
+
+    - Previously when compiling these CUDA SDK samples, gcc would generate a 
+      compilation error when building on a 64-bit Linux OS if the 32-bit glibc 
+      compatibility libraries were not previously installed.  This SDK release
+      addresses this problem.  The CUDA Driver API samples have been modified 
+      and solve this problem by casting device pointers correctly before 
+      being passed to CUDA kernels.
+    - When setting parameters for CUDA kernel functions, the address offset 
+      calculation is now properly aligned so that CUDA code and applications
+      will be compatible on 32-bit and 64-bit Linux platforms.
+    - The new CUDA Driver API samples by default build CUDA kernels with the 
+      output as PTX instead of CUBIN.  The CUDA Driver API samples now use 
+      PTXJIT to load the CUDA kernels and launch them.
+* Added sample pitchLinearTexture that shows how to texture from pitch linear
+  memory
+
+Release 2.2 Final
+* Added Mandelbrot (Julia Set), deviceQueryDrv, radixSort, SobolQRNG, threadFenceReduction
+* New CUDA 2.2 capabilities: 
+    - supports zero-mem copy (GT200, MCP79) 
+        * simpleZeroCopy SDK sample
+    - supports OS allocated pinned memory (write combined memory).  Test this by:
+        > bandwidthTest -memory=PINNED -wc
+
+Release 2.1 Final
+* CUDA samples that use OpenGL interop now call cudaGLSetGLDevice after the GL context is created.
+  This ensures that OpenGL/CUDA interop gets the best possible performance possible.
+* added bicubicTexture, SobelFilter, SobolQRNG, and radixSort, Mandelbrot (+Julia Set), 
+  deviceQueryDrv, simpleTexture3D, volumeRender
+
+Release 2.1 Beta
+* Added CUDA smokeParticles (volumetric particle shadows samples)
+* Note: added cutil_inline.h for CUDA functions as an alternative to using the
+        cutil.h macro definitions
+* For CUDA samples that use the Driver API, you must install the Linux 32-bit
+  compatibility (glibc) binaries on Linux 64-bit Platforms.  See Known issues in about
+  section IV on how to do this.
+
+Release 2.0 Final
+* Added simpleVoteIntrinsics (requires GT200)
+
+Release 2.0 Beta
+* Updated to the 2.1 CUDA Toolkit
+* CUT_DEVICE_INIT macro modified to take command line arguments. All samples now
+  support specifying the CUDA device to run on from the command line (“-device=n”).
+* deviceQuery sample: Updated to query number of multiprocessors and overlap
+  flag.
+* multiGPU sample: Renamed to simpleMultiGPU.
+* reduction, MonteCarlo, and binomialOptions samples: updated with optional
+  double precision support for upcoming hardware.
+* simpleAtomics sample: Renamed to simpleAtomicIntrinsics.
+* 7 new code samples: 
+  dct8x8, quasirandomGenerator, recursiveGaussian, 
+  simpleTexture3D, threadMigration, and volumeRender
+
+Release 1.1
+* Updated to the 1.1 CUDA Toolkit
+* Fixed several bugs in common/common.mk
+* Removed isInteropSupported() from cutil: OpenGL interop now works on multi-GPU
+  systems
+* MonteCarlo sample: Improved performance.  Previously it was very fast for
+  large numbers of paths and options, now it is also very fast for 
+  small- and medium-sized runs.
+* Transpose sample: updated kernel to use 2D shared memory array for clarity, 
+  and optimized bank conflicts.
+* 15 new code samples: 
+  asyncAPI, cudaOpenMP, eigenvalues, fastWalshTransform, histogram256,
+  lineOfSight, Mandelbrot, marchingCubes, MonteCarloMultiGPU, nbody, oceanFFT,
+  particles, reduction, simpleAtomics, and simpleStreams
+
+Release 1.0
+* Updated to the 1.0 CUDA Toolkit.
+* Added 4 new code samples: convolutionTexture, convolutionFFT2D,
+  histogram64, and SobelFilter.
+* All graphics interop samples now call the cutil library function 
+  isInteropSupported(), which returns false on machines with multiple CUDA GPUs,
+  currently (see above).
+* When compiling in DEBUG mode, CU_SAFE_CALL() now calls cuCtxSynchronize() and
+  CUDA_SAFE_CALL() and CUDA_CHECK_ERROR() now call cudaThreadSynchronize() in
+  order to return meaningful errors. This means that performance might suffer in
+  DEBUG mode.
+
+--------------------------------------------------------------------------------
+VII. Mac OSX Platforms Supported
+--------------------------------------------------------------------------------
+
+OS Platform Support support from 2.2
+    * MacOS X 10.5.6+ (32-bit)
+          o (llvm-)gcc 4.2 Apple 
